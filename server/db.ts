@@ -6,7 +6,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const db = new Database("techfix_v2.db");
+const dbPath = process.env.VERCEL ? "/tmp/techfix_v2.db" : "techfix_v2.db";
+const db = new Database(dbPath);
 
 export function initDb() {
   db.exec(`
