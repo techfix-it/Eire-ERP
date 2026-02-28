@@ -1,0 +1,39 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value-emerald {
+  color: var(--emerald-500);
+}
+
+.stat-value-white {
+  color: white;
+}
+
+.stat-value-amber {
+  color: var(--amber-500);
+}
+
+.stat-label {
+  color: var(--text-zinc-500);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.loading-text {
+  color: var(--text-zinc-500);
+}

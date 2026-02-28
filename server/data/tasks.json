@@ -1,0 +1,5 @@
+[
+  { "type": "delivery", "description": "Server Rack Installation", "address": "Grand Canal Dock, Dublin", "lat": 53.3421, "lng": -6.2367, "duration": 120 },
+  { "type": "visit", "description": "Network Troubleshooting", "address": "Rathmines, Dublin 6", "lat": 53.3228, "lng": -6.2675, "duration": 60 },
+  { "type": "pickup", "description": "Laptop Repair Collection", "address": "Dundrum, Dublin 14", "lat": 53.2911, "lng": -6.2456, "duration": 15 }
+]

@@ -1,0 +1,4 @@
+[
+  { "name": "Van 01 - Dublin North", "plate": "241-D-12345", "status": "available", "lat": 53.3498, "lng": -6.2603 },
+  { "name": "Van 02 - Dublin South", "plate": "232-D-67890", "status": "on_route", "lat": 53.3000, "lng": -6.2000 }
+]

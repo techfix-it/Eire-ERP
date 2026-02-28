@@ -1,0 +1,21 @@
+[
+  { "name": "Beats", "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Beats_Electronics_logo.svg", "description": "Design icônico e graves potentes para amantes de música." },
+  { "name": "Bose", "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Bose_logo.svg", "description": "Líder em cancelamento de ruído e fidelidade sonora premium." },
+  { "name": "Creative", "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Creative_Technology_logo.svg", "description": "Especialista em placas de som e periféricos de áudio para PC." },
+  { "name": "Focusrite", "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Focusrite_logo.png", "description": "Interfaces de áudio de nível profissional para estúdios." },
+  { "name": "JBL", "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/25/JBL_logo.svg", "description": "Áudio vibrante e caixas de som resistentes para qualquer lugar." },
+  { "name": "Sennheiser", "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Sennheiser-Logo.svg", "description": "A escolha dos audiófilos para áudio analítico e natural." },
+  { "name": "Sony", "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Sony_logo.svg", "description": "Inovação tecnológica em fones de ouvido e sistemas de som." },
+  { "name": "Acer", "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Acer_2011.svg", "description": "Notebooks gamers e corporativos com ótimo custo-benefício." },
+  { "name": "Apple", "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", "description": "Elegância e poder com a linha MacBook e ecossistema macOS." },
+  { "name": "ASUS", "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Asus_Logo.svg", "description": "Líder em inovação de placas-mãe e notebooks de alta performance." },
+  { "name": "Dell", "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg", "description": "Soluções computacionais confiáveis para casa e empresas." },
+  { "name": "HP", "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg", "description": "Tecnologia acessível e potente em laptops e impressoras." },
+  { "name": "Lenovo", "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Lenovo_logo_2015.svg", "description": "Inovação global em ThinkPads e notebooks versáteis." },
+  { "name": "Microsoft", "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg", "description": "O poder do Windows e da linha Surface para produtividade." },
+  { "name": "Samsung", "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg", "description": "Inovação em telas e armazenamento SSD de alta velocidade." },
+  { "name": "AMD", "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/AMD_Logo.svg", "description": "Processadores Ryzen e placas Radeon com poder incrível." },
+  { "name": "Corsair", "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Corsair_Logo.svg", "description": "Memórias, fontes e refrigeração de alto padrão para entusiastas." },
+  { "name": "NVIDIA", "image_url": "https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg", "description": "Poder visual absoluto para games e inteligência artificial." },
+  { "name": "Intel", "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Intel-logo.svg", "description": "Líder mundial em tecnologia de microprocessadores." }
+]

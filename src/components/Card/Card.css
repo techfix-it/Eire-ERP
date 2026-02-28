@@ -1,0 +1,26 @@
+/* Card Component */
+.card {
+  background-color: var(--bg-zinc-900);
+  border: 1px solid var(--border-zinc-800);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-zinc-800);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+}
+
+.card-body {
+  padding: 1.5rem;
+}

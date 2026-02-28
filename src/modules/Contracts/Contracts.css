@@ -1,0 +1,59 @@
+/* Contracts Styles */
+.contract-card {
+  padding: 1rem;
+  background-color: var(--bg-zinc-800);
+  border: 1px solid var(--border-zinc-700);
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.contract-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.contract-title {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.contract-status {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.contract-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.contract-detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.contract-detail-label {
+  font-size: 0.625rem;
+  color: var(--text-zinc-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.contract-detail-value {
+  font-size: 0.875rem;
+  color: var(--text-zinc-300);
+}
+
+.contract-actions {
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border-zinc-700);
+  padding-top: 0.75rem;
+}

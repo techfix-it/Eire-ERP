@@ -1,0 +1,10 @@
+[
+  { "name": "family_processor", "label": "Processor Family" },
+  { "name": "processor_model", "label": "Processor Model" },
+  { "name": "gpu_dedicated", "label": "Graphics Card" },
+  { "name": "ram_capacity", "label": "RAM Capacity" },
+  { "name": "storage_total", "label": "Storage Capacity" },
+  { "name": "screen_size", "label": "Screen Size" },
+  { "name": "refresh_rate", "label": "Refresh Rate" },
+  { "name": "os", "label": "Operating System" }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "brand": "MSI",
+    "category": "computadores-portateis",
+    "name": "MSI Titan GT77 AI - Ultra 9 275HX - RTX 5090",
+    "price": 5499.00,
+    "images": ["https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=400"],
+    "attributes": { "family_processor": "Intel Core Ultra 9", "gpu_dedicated": "NVIDIA GeForce RTX 5090", "ram_capacity": "192 GB", "storage_total": "4 TB" },
+    "sku": "SKU-MSI-0",
+    "condition": "new",
+    "description": "High performance MSI Titan GT77 AI - Ultra 9 275HX - RTX 5090 from MSI",
+    "stock_quantity": 25
+  },
+  {
+    "brand": "ASUS",
+    "category": "gaming-desktops",
+    "name": "ROG Strix G35 Desktop - Ultra 9 275HX - RTX 5090",
+    "price": 4899.00,
+    "images": ["https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400"],
+    "attributes": { "family_processor": "Intel Core Ultra 9", "gpu_dedicated": "NVIDIA GeForce RTX 5090", "ram_capacity": "128 GB", "storage_total": "8 TB NVMe" },
+    "sku": "SKU-ASUS-1",
+    "condition": "new",
+    "description": "High performance ROG Strix G35 Desktop - Ultra 9 275HX - RTX 5090 from ASUS",
+    "stock_quantity": 15
+  },
+  {
+    "brand": "Apple",
+    "category": "computadores-portateis",
+    "name": "MacBook Pro 16 M3 Max - 128GB RAM - 8TB SSD",
+    "price": 7200.00,
+    "images": ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400"],
+    "attributes": { "family_processor": "Apple M3 Max", "gpu_dedicated": "40-core GPU", "ram_capacity": "128 GB", "storage_total": "8 TB" },
+    "sku": "SKU-APPLE-2",
+    "condition": "new",
+    "description": "High performance MacBook Pro 16 M3 Max - 128GB RAM - 8TB SSD from Apple",
+    "stock_quantity": 10
+  }
+]

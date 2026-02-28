@@ -1,0 +1,97 @@
+/* Profitability styles */
+
+.finance-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .finance-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card-value-positive {
+  color: var(--emerald-500);
+}
+
+.dre-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border-zinc-800);
+}
+
+.dre-row:last-child {
+  border-bottom: none;
+}
+
+.dre-row-highlight {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.dre-row-final {
+  border-left: 4px solid var(--emerald-500);
+}
+
+.dre-row-sub {
+  padding-left: 2.5rem;
+}
+
+.dre-row-main {
+  padding-left: 1rem;
+}
+
+.dre-label-container {
+  display: flex;
+  align-items: center;
+}
+
+.dre-icon-main {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.75rem;
+  color: var(--text-zinc-500);
+}
+
+.dre-icon-sub {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.75rem;
+  color: var(--text-zinc-400);
+}
+
+.dre-label {
+  font-size: 0.875rem;
+  color: var(--text-zinc-500);
+  font-weight: 400;
+}
+
+.dre-label-highlight {
+  font-size: 0.875rem;
+  color: white;
+  font-weight: 700;
+}
+
+.dre-value {
+  font-weight: 500;
+  color: white;
+}
+
+.dre-value-negative {
+  color: var(--red-500);
+}
+
+.dre-value-highlight {
+  color: var(--emerald-500);
+}

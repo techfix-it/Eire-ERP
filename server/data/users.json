@@ -1,0 +1,44 @@
+[
+  {
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin",
+    "permissions": ["dashboard", "invoices", "inventory", "shipping", "pos", "service_orders", "contracts", "users", "fleet", "cash_flow", "profitability"]
+  },
+  {
+    "username": "sales_user",
+    "password": "sales123",
+    "role": "sales",
+    "permissions": ["dashboard", "pos", "invoices"]
+  },
+  {
+    "username": "tech_user",
+    "password": "tech123",
+    "role": "technician",
+    "permissions": ["dashboard", "service_orders"]
+  },
+  {
+    "username": "finance_user",
+    "password": "finance123",
+    "role": "finance",
+    "permissions": ["dashboard", "invoices", "cash_flow", "profitability", "contracts"]
+  },
+  {
+    "username": "logistics_user",
+    "password": "logistics123",
+    "role": "logistics",
+    "permissions": ["dashboard", "fleet", "shipping"]
+  },
+  {
+    "username": "stock_user",
+    "password": "stock123",
+    "role": "stock",
+    "permissions": ["dashboard", "inventory"]
+  },
+  {
+    "username": "accounting_user",
+    "password": "accounting123",
+    "role": "accounting",
+    "permissions": ["dashboard", "invoices", "cash_flow", "profitability"]
+  }
+]

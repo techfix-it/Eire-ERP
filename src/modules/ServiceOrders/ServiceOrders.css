@@ -1,0 +1,35 @@
+/* Service Orders Styles */
+.service-order-card {
+  padding: 1rem;
+  background-color: var(--bg-zinc-800);
+  border: 1px solid var(--border-zinc-700);
+  border-left: 4px solid var(--amber-500);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.service-order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.service-order-title {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.service-order-status {
+  font-size: 0.75rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--amber-500);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.service-order-footer {
+  font-size: 0.75rem;
+  color: var(--text-zinc-500);
+}
