@@ -1,13 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
+  // Ensure these are set in your .env.local
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,8 +34,29 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protect all routes under (protected)
-  if (!user && request.nextUrl.pathname !== '/login') {
+  const { pathname } = request.nextUrl
+
+  // 1. Allow public routes and static assets
+  if (
+    pathname === '/login' || 
+    pathname === '/api/auth/login' || 
+    pathname.startsWith('/_next') ||
+    pathname.includes('.') // Static files like images, fonts, etc.
+  ) {
+    return response
+  }
+
+  // 2. Protect all other routes
+  if (!user) {
+    // If it's an API request, return JSON 401
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'unauthorized', message: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+    
+    // For page requests, redirect to login
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -43,13 +65,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
