@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: vehicles, error } = await supabase.from('vehicles').select('*');
+    if (error) throw error;
 
-    const vehicles = db.prepare("SELECT * FROM vehicles").all();
-    return NextResponse.json(vehicles);
+    return NextResponse.json(vehicles || []);
   } catch (error) {
+    console.error('Fleet GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

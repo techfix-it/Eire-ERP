@@ -1,38 +1,51 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: contracts, error } = await supabase
+      .from('contracts')
+      .select('*')
+      .order('start_date', { ascending: false });
 
-    const contracts = db.prepare("SELECT * FROM contracts ORDER BY start_date DESC").all();
-    return NextResponse.json(contracts);
+    if (error) throw error;
+
+    return NextResponse.json(contracts || []);
   } catch (error) {
+    console.error('Contracts GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { customer_name, terms, start_date, end_date, status } = await request.json();
     
-    const result = db.prepare(`
-        INSERT INTO contracts (customer_name, terms, start_date, end_date, status) 
-        VALUES (?, ?, ?, ?, ?)
-    `).run(customer_name, terms, start_date, end_date, status || 'active');
+    const { data: contract, error } = await supabase
+      .from('contracts')
+      .insert([{
+        customer_name,
+        terms,
+        start_date: start_date || new Date().toISOString().split('T')[0],
+        end_date,
+        status: status || 'active'
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
     
-    return NextResponse.json({ success: true, id: result.lastInsertRowid });
+    return NextResponse.json({ success: true, id: contract.id });
   } catch (error) {
+    console.error('Contracts POST error:', error);
     return NextResponse.json({ error: 'Failed to create contract' }, { status: 400 });
   }
 }

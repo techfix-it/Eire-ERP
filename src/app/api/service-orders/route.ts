@@ -1,38 +1,50 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: orders, error } = await supabase
+      .from('service_orders')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const orders = db.prepare("SELECT * FROM service_orders ORDER BY created_at DESC").all();
-    return NextResponse.json(orders);
+    if (error) throw error;
+
+    return NextResponse.json(orders || []);
   } catch (error) {
+    console.error('Service Orders GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { customer_name, description, status } = await request.json();
     
-    const result = db.prepare(`
-        INSERT INTO service_orders (customer_name, description, status) 
-        VALUES (?, ?, ?)
-    `).run(customer_name, description, status || 'open');
+    const { data: order, error } = await supabase
+      .from('service_orders')
+      .insert([{
+        customer_name,
+        description,
+        status: status || 'open',
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
     
-    return NextResponse.json({ success: true, id: result.lastInsertRowid });
+    return NextResponse.json({ success: true, id: order.id });
   } catch (error) {
+    console.error('Service Orders POST error:', error);
     return NextResponse.json({ error: 'Failed to create service order' }, { status: 400 });
   }
 }

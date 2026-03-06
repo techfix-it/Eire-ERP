@@ -1,29 +1,44 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Dynamic DRE calculation from Supabase
+    const [
+      { data: invoices },
+      { data: transactions }
+    ] = await Promise.all([
+      supabase.from('invoices').select('total_amount, vat_amount').eq('status', 'paid'),
+      supabase.from('transactions').select('amount, type, category')
+    ]);
 
-    // In a real scenario, this would calculate based on invoices/transactions
-    // For now, mirroring the original mocked DRE
+    const grossRevenue = (invoices?.reduce((acc, inv) => acc + (Number(inv.total_amount) || 0), 0) || 0) +
+                        (transactions?.filter(t => t.type === 'in').reduce((acc, t) => acc + (Number(t.amount) || 0), 0) || 0);
+    
+    const taxes = invoices?.reduce((acc, inv) => acc + (Number(inv.vat_amount) || 0), 0) || (grossRevenue * 0.14); // Est. 14% if no data
+    const netRevenue = grossRevenue - taxes;
+    const cogs = transactions?.filter(t => t.category === 'Inventory').reduce((acc, t) => acc + (Number(t.amount) || 0), 0) || (grossRevenue * 0.33);
+    const grossProfit = netRevenue - cogs;
+    const operatingExpenses = transactions?.filter(t => t.type === 'out' && t.category !== 'Inventory').reduce((acc, t) => acc + (Number(t.amount) || 0), 0) || (grossRevenue * 0.21);
+    const ebitda = grossProfit - operatingExpenses;
+    const netProfit = ebitda * 0.8; // Est. 20% corp tax
+
     return NextResponse.json({
-      grossRevenue: 85000,
-      taxes: 12000,
-      netRevenue: 73000,
-      cogs: 28000,
-      grossProfit: 45000,
-      operatingExpenses: 18000,
-      ebitda: 27000,
-      netProfit: 21600
+      grossRevenue,
+      taxes,
+      netRevenue,
+      cogs,
+      grossProfit,
+      operatingExpenses,
+      ebitda,
+      netProfit
     });
   } catch (error) {
+    console.error('DRE calculation error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,11 +1,16 @@
-import React from 'react';
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import Card from '@/components/Card/Card';
 import { Plus } from 'lucide-react';
 import '@/modules/Contracts/Contracts.css';
 
 export default async function ContractsPage() {
-  const contracts = db.prepare("SELECT * FROM contracts ORDER BY start_date DESC").all() as any[];
+  const supabase = await createClient();
+  const { data: contracts } = await supabase
+    .from('contracts')
+    .select('*')
+    .order('start_date', { ascending: false });
+
+  const typedContracts = contracts || [];
 
   return (
     <div className="module-container">
@@ -22,10 +27,10 @@ export default async function ContractsPage() {
           <span className="stat-card-value-positive" style={{ fontWeight: '500', fontSize: 'inherit', color: 'var(--emerald-500)' }}> Consumer Rights Act 2022 (Ireland)</span>.
         </div>
         <div className="item-list">
-          {contracts.length === 0 ? (
+          {typedContracts.length === 0 ? (
             <div className="item-sub-text">No active contracts found.</div>
           ) : (
-            contracts.map(c => (
+            typedContracts.map(c => (
               <div key={c.id} className="contract-card" style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'rgba(39, 39, 42, 0.5)', borderRadius: '0.5rem', border: '1px solid var(--border-zinc-800)' }}>
                 <div className="contract-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>

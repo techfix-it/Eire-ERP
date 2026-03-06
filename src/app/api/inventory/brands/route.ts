@@ -1,35 +1,35 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: brands, error } = await supabase.from('brands').select('*').order('name');
+    if (error) throw error;
 
-    const brands = db.prepare("SELECT * FROM brands").all();
-    return NextResponse.json(brands);
+    return NextResponse.json(brands || []);
   } catch (error) {
+    console.error('Brands GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { name, image_url, description } = await request.json();
-    db.prepare("INSERT INTO brands (name, image_url, description) VALUES (?, ?, ?)")
-      .run(name, image_url, description);
+    const { error } = await supabase.from('brands').insert([{ name, image_url, description }]);
+    if (error) throw error;
     
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Brands POST error:', error);
     return NextResponse.json({ error: 'Brand name must be unique' }, { status: 400 });
   }
 }

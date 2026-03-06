@@ -1,20 +1,36 @@
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import Card from '@/components/Card/Card';
 import '@/modules/Dashboard/Dashboard.css';
 
 export default async function DashboardPage() {
-  // Direct DB access because this is a Server Component
-  const invoices = db.prepare("SELECT SUM(total_amount) as total FROM invoices WHERE status = 'paid'").get() as any;
-  const contracts = db.prepare("SELECT COUNT(*) as count FROM contracts WHERE status = 'active'").get() as any;
-  const stockAlerts = db.prepare("SELECT COUNT(*) as count FROM products WHERE stock_quantity < 10").get() as any;
-  const transactions = db.prepare("SELECT SUM(amount) as total FROM transactions WHERE type = 'in'").get() as any;
+  const supabase = await createClient();
+
+  // Fetch summaries in parallel
+  const [
+    { data: invoices },
+    { data: contractsCount },
+    { data: stockAlerts },
+    { data: transactions }
+  ] = await Promise.all([
+    supabase.from('invoices').select('total_amount').eq('status', 'paid'),
+    supabase.from('contracts').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('products').select('*', { count: 'exact', head: true }).lt('stock_quantity', 10),
+    supabase.from('transactions').select('amount').eq('type', 'in')
+  ]);
+
+  const revenue = (invoices?.reduce((acc, inv) => acc + (Number(inv.total_amount) || 0), 0) || 0) +
+                  (transactions?.reduce((acc, tran) => acc + (Number(tran.amount) || 0), 0) || 0);
 
   const stats = {
-    revenue: (invoices?.total || 0) + (transactions?.total || 0),
-    activeContracts: contracts?.count || 0,
-    stockAlerts: stockAlerts?.count || 0
+    revenue,
+    activeContracts: contractsCount === null ? 0 : (contractsCount as any).count || 0,
+    stockAlerts: stockAlerts === null ? 0 : (stockAlerts as any).count || 0
   };
 
+  // If count: 'exact' and head: true, the return value should have count
+  // But let's handle the specific return type of supabase count queries correctly
+  // In newer supabase-js, count is returned directly in the response object
+  
   return (
     <div className="dashboard-grid">
       <Card title="Revenue (MTD)">

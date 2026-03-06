@@ -1,46 +1,60 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('name');
 
-    const products = db.prepare("SELECT * FROM products").all() as any[];
-    return NextResponse.json(products.map(p => ({
+    if (error) throw error;
+
+    return NextResponse.json((products || []).map(p => ({
       ...p,
-      attributes: p.attributes ? JSON.parse(p.attributes) : {},
-      images: p.images ? JSON.parse(p.images) : []
+      attributes: typeof p.attributes === 'string' ? JSON.parse(p.attributes) : (p.attributes || {}),
+      images: Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : [])
     })));
   } catch (error) {
+    console.error('Inventory GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { name, sku, brand, category, condition, description, attributes, images, price, stock_quantity, vat_rate } = await request.json();
+    const body = await request.json();
+    const { name, sku, brand, category, condition, description, attributes, images, price, stock_quantity, vat_rate } = body;
     
-    db.prepare(`
-        INSERT INTO products (name, sku, brand, category, condition, description, attributes, images, price, stock_quantity, vat_rate) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-        name, sku, brand, category, condition, description, 
-        JSON.stringify(attributes || {}), JSON.stringify(images || []), 
-        price, stock_quantity, vat_rate || 23.0
-    );
+    const { error } = await supabase
+      .from('products')
+      .insert([{
+        name, 
+        sku, 
+        brand, 
+        category, 
+        condition: condition || 'new', 
+        description, 
+        attributes: attributes || {}, 
+        images: images || [], 
+        price, 
+        stock_quantity, 
+        vat_rate: vat_rate || 23.0
+      }]);
+
+    if (error) throw error;
     
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Inventory POST error:', error);
     return NextResponse.json({ error: 'SKU must be unique or missing fields' }, { status: 400 });
   }
 }

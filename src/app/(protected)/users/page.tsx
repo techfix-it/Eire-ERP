@@ -1,12 +1,18 @@
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import UsersClient from './UsersClient';
 
 export default async function UsersPage() {
-  const users = db.prepare("SELECT id, username, role, permissions FROM users").all() as any[];
+  const supabase = await createClient();
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, username, role, permissions');
   
-  const serializedUsers = users.map(u => ({
+  const serializedUsers = (profiles || []).map(u => ({
     ...u,
-    permissions: JSON.parse(u.permissions || '["dashboard"]')
+    permissions: typeof u.permissions === 'string' 
+      ? JSON.parse(u.permissions || '["dashboard"]') 
+      : (u.permissions || ["dashboard"])
   }));
 
   return (

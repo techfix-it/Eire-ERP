@@ -1,24 +1,30 @@
 import React from 'react';
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import Card from '@/components/Card/Card';
 import { TrendingUp, Minus, Plus, Info } from 'lucide-react';
 import '@/modules/Profitability/Profitability.css';
 
 export default async function ProfitabilityPage() {
+  const supabase = await createClient();
+
   // Fetch transactions to calculate real DRE
-  const transactions = db.prepare("SELECT * FROM transactions").all() as any[];
+  const { data: transactions } = await supabase
+    .from('transactions')
+    .select('*');
 
-  const grossRevenue = transactions
+  const typedTransactions = (transactions || []);
+
+  const grossRevenue = typedTransactions
     .filter(t => t.type === 'in')
-    .reduce((acc, t) => acc + t.amount, 0);
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
-  const cogs = transactions
+  const cogs = typedTransactions
     .filter(t => t.type === 'out' && (t.category === 'Fornecedor' || t.category === 'Custo Direto'))
-    .reduce((acc, t) => acc + t.amount, 0);
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
-  const operatingExpenses = transactions
+  const operatingExpenses = typedTransactions
     .filter(t => t.type === 'out' && !(['Fornecedor', 'Custo Direto'].includes(t.category)))
-    .reduce((acc, t) => acc + t.amount, 0);
+    .reduce((acc, t) => acc + (Number(t.amount) || 0), 0);
 
   // Ireland approx VAT/Tax on sales (just for demo consistency with screenshot)
   const salesTaxes = grossRevenue * 0.141; // Derived from screenshot ratio 12000/85000
@@ -31,9 +37,9 @@ export default async function ProfitabilityPage() {
   const netProfit = ebitda - corporationTax;
 
   // Margins
-  const grossMargin = (grossProfit / grossRevenue) * 100;
-  const netMargin = (netProfit / grossRevenue) * 100;
-  const operatingEfficiency = (ebitda / grossRevenue) * 100;
+  const grossMargin = grossRevenue > 0 ? (grossProfit / grossRevenue) * 100 : 0;
+  const netMargin = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
+  const operatingEfficiency = grossRevenue > 0 ? (ebitda / grossRevenue) * 100 : 0;
 
   const rows = [
     { label: "Gross Revenue", value: grossRevenue, icon: TrendingUp, type: 'main' },

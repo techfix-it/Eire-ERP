@@ -1,38 +1,52 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { data: invoices, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .order('issue_date', { ascending: false });
 
-    const invoices = db.prepare("SELECT * FROM invoices ORDER BY issue_date DESC").all();
-    return NextResponse.json(invoices);
+    if (error) throw error;
+
+    return NextResponse.json(invoices || []);
   } catch (error) {
+    console.error('Invoices GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
-    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { customer_name, customer_email, total_amount, vat_amount, status } = await request.json();
     
-    const result = db.prepare(`
-        INSERT INTO invoices (customer_name, customer_email, total_amount, vat_amount, status) 
-        VALUES (?, ?, ?, ?, ?)
-    `).run(customer_name, customer_email, total_amount, vat_amount, status || 'pending');
+    const { data: invoice, error } = await supabase
+      .from('invoices')
+      .insert([{
+        customer_name,
+        customer_email,
+        total_amount,
+        vat_amount: vat_amount || (total_amount * 0.23), // Default 23% VAT if not provided
+        status: status || 'pending',
+        issue_date: new Date().toISOString()
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
     
-    return NextResponse.json({ success: true, id: result.lastInsertRowid });
+    return NextResponse.json({ success: true, id: invoice.id });
   } catch (error) {
+    console.error('Invoices POST error:', error);
     return NextResponse.json({ error: 'Failed to create invoice' }, { status: 400 });
   }
 }

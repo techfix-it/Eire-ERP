@@ -1,11 +1,16 @@
-import React from 'react';
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import Card from '@/components/Card/Card';
 import { Plus } from 'lucide-react';
 import '@/modules/ServiceOrders/ServiceOrders.css';
 
 export default async function ServiceOrdersPage() {
-  const orders = db.prepare("SELECT * FROM service_orders ORDER BY created_at DESC").all() as any[];
+  const supabase = await createClient();
+  const { data: orders } = await supabase
+    .from('service_orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const typedOrders = orders || [];
 
   return (
     <div className="module-container">
@@ -19,10 +24,10 @@ export default async function ServiceOrdersPage() {
       >
         <div className="item-sub-text" style={{ marginBottom: '1.5rem' }}>Track maintenance and repair orders across Ireland.</div>
         <div className="item-list">
-          {orders.length === 0 ? (
+          {typedOrders.length === 0 ? (
             <div className="item-sub-text">No service orders found.</div>
           ) : (
-            orders.map(order => (
+            typedOrders.map(order => (
               <div key={order.id} className="service-order-card" style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'rgba(39, 39, 42, 0.5)', borderRadius: '0.5rem', border: '1px solid var(--border-zinc-800)' }}>
                 <div className="service-order-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                   <span className="service-order-title" style={{ color: 'white', fontWeight: '600' }}>OS-{order.id}: {order.customer_name}</span>

@@ -1,16 +1,24 @@
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import FleetClient from './FleetClient';
 
 export default async function FleetPage() {
-  const vehicles = db.prepare("SELECT * FROM vehicles").all() as any[];
-  const tasks = db.prepare("SELECT * FROM tasks ORDER BY order_index ASC").all() as any[];
-  const messages = db.prepare("SELECT * FROM messages ORDER BY timestamp DESC LIMIT 20").all() as any[];
+  const supabase = await createClient();
+
+  const [
+    { data: vehicles },
+    { data: tasks },
+    { data: messages }
+  ] = await Promise.all([
+    supabase.from('vehicles').select('*'),
+    supabase.from('tasks').select('*').order('priority', { ascending: false }),
+    supabase.from('messages').select('*').order('timestamp', { ascending: false }).limit(20)
+  ]);
 
   return (
     <FleetClient 
-      initialVehicles={vehicles}
-      initialTasks={tasks}
-      initialMessages={messages}
+      initialVehicles={vehicles || []}
+      initialTasks={tasks || []}
+      initialMessages={messages || []}
     />
   );
 }

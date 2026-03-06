@@ -1,12 +1,18 @@
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import POSClient from './POSClient';
 
 export default async function POSPage() {
-  const products = db.prepare("SELECT * FROM products WHERE stock_quantity > 0").all() as any[];
+  const supabase = await createClient();
 
-  const serializedProducts = products.map(p => ({
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .gt('stock_quantity', 0)
+    .order('name');
+
+  const serializedProducts = (products || []).map(p => ({
     ...p,
-    images: p.images ? JSON.parse(p.images) : []
+    images: Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : [])
   }));
 
   return (

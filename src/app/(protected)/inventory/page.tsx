@@ -1,24 +1,32 @@
-import db from '@/lib/db';
+import { createClient } from '@/utils/supabase/server';
 import InventoryClient from './InventoryClient';
 
 export default async function InventoryPage() {
-  // SSR directly from DB
-  const products = db.prepare("SELECT * FROM products").all() as any[];
-  const brands = db.prepare("SELECT * FROM brands").all() as any[];
-  const attributes = db.prepare("SELECT * FROM attribute_definitions").all() as any[];
+  const supabase = await createClient();
 
-  // Data processing for the client
-  const serializedProducts = products.map(p => ({
+  // Fetch data in parallel for efficiency
+  const [
+    { data: products },
+    { data: brands },
+    { data: attributes }
+  ] = await Promise.all([
+    supabase.from('products').select('*').order('name'),
+    supabase.from('brands').select('*').order('name'),
+    supabase.from('attribute_definitions').select('*').order('name')
+  ]);
+
+  // Data processing for the client (Supabase stores JSON/Array natively if configured)
+  const serializedProducts = (products || []).map(p => ({
     ...p,
-    attributes: p.attributes ? JSON.parse(p.attributes) : {},
-    images: p.images ? JSON.parse(p.images) : []
+    attributes: typeof p.attributes === 'string' ? JSON.parse(p.attributes) : (p.attributes || {}),
+    images: Array.isArray(p.images) ? p.images : (typeof p.images === 'string' ? JSON.parse(p.images) : [])
   }));
 
   return (
     <InventoryClient 
       initialProducts={serializedProducts}
-      initialBrands={brands}
-      initialAttributes={attributes}
+      initialBrands={brands || []}
+      initialAttributes={attributes || []}
     />
   );
 }

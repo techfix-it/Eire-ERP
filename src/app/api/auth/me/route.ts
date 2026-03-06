@@ -1,27 +1,40 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import { headers } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET() {
   try {
-    const headersList = await headers();
-    const token = headersList.get('authorization');
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!token) {
+    if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(token) as any;
+    // Get profile details from our public.profiles table
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (profileError || !profile) {
+      // Fallback or handle missing profile
+      return NextResponse.json({
+        id: user.id,
+        email: user.email,
+        username: user.user_metadata?.username || user.email,
+        role: user.user_metadata?.role || 'technician',
+        permissions: ["dashboard"]
+      });
     }
 
     return NextResponse.json({
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      permissions: JSON.parse(user.permissions)
+      id: profile.id,
+      username: profile.username,
+      role: profile.role,
+      permissions: typeof profile.permissions === 'string' 
+        ? JSON.parse(profile.permissions) 
+        : (profile.permissions || ["dashboard"])
     });
   } catch (error) {
     console.error('Auth me error:', error);
