@@ -1,9 +1,33 @@
+# Dependencies
 node_modules/
 
+# Next.js
+.next/
+out/
+
+# Build outputs
 build/
 dist/
 coverage/
-.DS_Store
-*.log
+
+# Environment variables
 .env*
 !.env.example
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.log
+
+# Database
+*.db
+*.db-journal
+
+# Editor and Tool-specific
+.vscode/
+.idea/
+.serverless/
+.turbo/
+
+# Next.js 15 Telemetry
+.next/cache/

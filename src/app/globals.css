@@ -1,0 +1,26 @@
+:root {
+  --bg-black: #09090b;
+  --bg-zinc-900: #18181b;
+  --bg-zinc-800: #27272a;
+  --bg-zinc-950: #040405;
+  --text-zinc-300: #d4d4d8;
+  --text-zinc-400: #a1a1aa;
+  --text-zinc-500: #71717a;
+  --border-zinc-700: #3f3f46;
+  --border-zinc-800: #27272a;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-black);
+  color: white;
+  font-family: var(--font-sans);
+}
