@@ -8,10 +8,7 @@ interface UsersManagementProps {
   currentUser?: any;
 }
 
-const ALL_PERMISSIONS = [
-  'dashboard', 'inventory', 'pos', 'service_orders', 'contracts', 
-  'fleet', 'shipping', 'cash_flow', 'profitability', 'invoices', 'users'
-];
+import { ALL_PERMISSIONS } from '@/utils/permissions';
 
 const UsersManagement: React.FC<UsersManagementProps> = ({ currentUser }) => {
   const [users, setUsers] = useState<any[]>([]);

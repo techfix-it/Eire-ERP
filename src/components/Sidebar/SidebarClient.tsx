@@ -81,8 +81,9 @@ const Sidebar = ({ user, handleLogout, setIsMobileMenuOpen }: SidebarProps) => {
       <nav className="sidebar-nav">
         {menuItems.map(item => {
           const isActive = pathname.startsWith(item.href);
-          const hasPermission = user?.permissions?.includes(item.id.replace(/-/g, '_')) || item.id === 'dashboard';
-          const isAdminRequired = item.adminOnly && user?.role !== 'admin';
+          const isAdmin = user?.role === 'admin';
+          const hasPermission = isAdmin || user?.permissions?.includes(item.id.replace(/-/g, '_')) || item.id === 'dashboard';
+          const isAdminRequired = item.adminOnly && !isAdmin;
 
           if (isAdminRequired || !hasPermission) return null;
 

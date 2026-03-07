@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { ALL_PERMISSIONS } from '@/utils/permissions';
 
 export async function GET() {
   try {
@@ -28,13 +29,18 @@ export async function GET() {
       });
     }
 
+    let permissions = profile.permissions || ["dashboard"];
+    if (profile.role === 'admin') {
+      permissions = ALL_PERMISSIONS;
+    } else if (typeof permissions === 'string') {
+      permissions = JSON.parse(permissions);
+    }
+
     return NextResponse.json({
       id: profile.id,
       username: profile.username,
       role: profile.role,
-      permissions: typeof profile.permissions === 'string' 
-        ? JSON.parse(profile.permissions) 
-        : (profile.permissions || ["dashboard"])
+      permissions: permissions
     });
   } catch (error) {
     console.error('Auth me error:', error);

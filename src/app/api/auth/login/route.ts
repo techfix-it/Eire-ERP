@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { ALL_PERMISSIONS } from '@/utils/permissions';
 
 export async function POST(request: Request) {
   try {
@@ -29,11 +30,23 @@ export async function POST(request: Request) {
       .eq('id', authData.user.id)
       .single();
 
+    if (!profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    // For admin role, grant all permissions
+    let permissions = profile.permissions || ["dashboard"];
+    if (profile.role === 'admin') {
+      permissions = ALL_PERMISSIONS;
+    } else if (typeof permissions === 'string') {
+      permissions = JSON.parse(permissions);
+    }
+
     return NextResponse.json({
-      id: authData.user.id,
-      username: profile?.username || authData.user.email,
-      role: profile?.role || 'user',
-      permissions: profile?.permissions || ["dashboard"]
+      id: profile.id,
+      username: profile.username,
+      role: profile.role,
+      permissions: permissions
     });
   } catch (error) {
     console.error('Login error:', error);
